@@ -323,37 +323,6 @@ def main():
             # 1) Read the same .txt to get recall_map (= efficiency per pattern)
             p_detect, p_err_detect, recall_map, misid_map = read_probabilities(rutas_txt[i])
         
-            import json, pathlib
-            json_path = pathlib.Path("../p_diff.json")
-            with json_path.open() as f:
-                tmp = json.load(f)    
-            p_diff = {(int(k.split("|")[0]), k.split("|")[1]): v for k, v in tmp.items()}
-
-
-            def tup2str(t):                        # (1,1,2) → '112'
-                return "".join(str(x) for x in t)
-            
-            # ─────  DIFFUSION CONTRIBUTION FOR ALL PATTERNS  ───────────
-            print(f"\n--> File {i+1}: {txt_paths[i]}")
-
-            for E in patterns_to_show:
-                pat_str = tup2str(E)
-                eps     = recall_map.get(E, 1.0)  # use efficiency from the .txt      
-                delta   = 0.0
-
-                # --- sum ΔN_q→E for q = 1..5 -----------------
-                for q in range(1, 6):
-                    prob = p_diff.get((q, pat_str), 0.0)    
-                    if prob == 0.0:
-                        continue
-                    delta += N_selc_pix[i] * poisson.pmf(q, lambdas[i]) * prob * eps
-
-                diffusion_contributions[E] = delta
-
-                # --- iprint diffusion separately ----------
-                if delta > 0:
-                    print(f"    (difusión) ΔN_{pat_str} = {delta:.3e}")
-        
             print(f"    λ = {lambdas[i]:.6f} ± {lambdas_err[i]:.6f},  N_pix = {N_selc_pix[i]}")
 
             # Print only selected patterns from THIS sub-config
