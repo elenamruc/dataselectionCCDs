@@ -1,34 +1,35 @@
-# Data Selection and Visualization
+# Data Selection and Pattern Analysis for CCDs (DAMIC-M)
 
-This repository contains Python scripts developed for CCD data cleaning, masking, validation and pattern recognition for low-energy charge detection in dark matter experiments (DAMIC-M).
+This repository contains all scripts used for the **selection of low-energy events**, **masking**, and **pattern identification** in CCD images from dark matter experiments such as **DAMIC-M**. It includes tools for detection, efficiency analysis, confusion matrices, and visualization of simulated or real data.
+
+---
+
+## Repository Structure
+
+### `results_analysis/`
+Scripts for **aggregating and analyzing results** from multiple datasets or dates.
+
+- `results_data_selection.py`: 
+---
+### `pattern_id/`
+Contains all core scripts for **pattern detection** in CCD images after masking.
+
+- `pattern_identification.py`: Main pipeline to detect isolated single and multi-pixel patterns using CDFs and a cascade method.
+- `efficiencies_patterns.py`: Computes **recall**, **precision**, and **misidentification rate** for each pattern, using weighted counts and propagating uncertainties. Saves results to file.
+- `comparison_patterns.py`: Calculates the expected number of patterns based on: A Poisson distribution for the number of unmasked pixels (N_selc_pix) and a diffusion model that gives the probability that a charge q generates a given pattern after diffusion.
+
+---
 
 ## Scripts Overview
 
-1. **histogram_noise_combined.py**
-   - Combines noise histograms from different modules for comparison.
-   - Features Gaussian fitting capabilities to analyze noise characteristics.
+### `pattern_identification.py`
 
-2. **histogram_SCurve_plots.py**
-   - Generates SCurve plots from `.root` files.
-   - Applies Gaussian fits to extract performance metrics from the SCurve distributions.
+**Main script for detection**:
+- Input: FITS image with masking extensions.
+- Detects isolated charge clusters (1–3 pixels).
+- Uses precomputed CDF tables and `-log(CDF)` scoring.
+- Enforces constraints: score threshold, local isolation, shape uniqueness.
+- Output: pattern histograms and charge distributions.
 
-3. **hitsperpixel.py**
-   - Draws and saves histograms of hits per pixel.
-   - Capable of applying additional axis and adjusting visual elements like color scales.
-
-4. **masked_noisy_stuck_pix.py**
-   - Analyzes and visualizes distributions of masked, noisy, and stuck pixels.
-   - Identifies problematic pixels and provides detailed statistics.
-
-5. **plotsreverse.py**
-   - Performs differential analysis between forward and reverse bias conditions.
-   - Highlights shifts in threshold and noise values across conditions.
-
-6. **save_histograms.py**
-   - General-purpose script to save histograms from `.root` files.
-   - Includes functionality to adjust visual settings and manage output files efficiently.
-
-### Usage
-Specified in each script, for example:
 ```bash
-python histogram_noise_comined.py <input_file.root> <output_directory>
+python3 pattern_identification.py -f image1.fits image2.fits
